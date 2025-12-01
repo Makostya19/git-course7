@@ -2,9 +2,8 @@ const input = document.getElementById("search");
 const suggestions = document.getElementById("suggestions");
 const repoList = document.getElementById("repoList");
 
-let timer = null;
-
 function debounce(fn, delay = 600) {
+  let timer;
   return (...args) => {
     clearTimeout(timer);
     timer = setTimeout(() => fn(...args), delay);
@@ -19,16 +18,16 @@ async function loadRepos(query) {
 
   try {
     const res = await fetch(
-      `https://api.github.com/search/repositories?q=${query}&per_page=5`
+      `https://api.github.com/search/repositories?q=${encodeURIComponent(query)}&per_page=5`
     );
     const data = await res.json();
 
     suggestions.innerHTML = "";
-
     if (!data.items) return;
 
     data.items.forEach(repo => {
       const option = document.createElement("div");
+      option.className = "suggestion-item";
       option.textContent = repo.full_name;
 
       option.addEventListener("click", () => {
@@ -51,11 +50,11 @@ function addRepoToList(repo) {
 
   card.innerHTML = `
     <div class="repo-info">
-      Name: ${repo.name}
-      Owner: ${repo.owner.login}
-      Stars: ${repo.stargazers_count}
+      <p><b>Name:</b> ${repo.name}</p>
+      <p><b>Owner:</b> ${repo.owner.login}</p>
+      <p><b>Stars:</b> ⭐ ${repo.stargazers_count}</p>
     </div>
-    <button class="delete-btn">✖</button>
+    <button class="delete-btn">&times;</button>
   `;
 
   card.querySelector(".delete-btn").addEventListener("click", () => {
@@ -65,4 +64,4 @@ function addRepoToList(repo) {
   repoList.appendChild(card);
 }
 
-input.addEventListener("input", debounce(() => loadRepos(input.value)));
+input.addEventListener("input", debounce(() => loadRepos(input.value), 600));
