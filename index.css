@@ -1,49 +1,59 @@
 body {
-  font-family: Arial;
-  background: #f3f3f3;
-  padding: 40px;
+  margin: 0;
+  background: #bfbfbf;
+  font-family: sans-serif;
 }
 
 .container {
-  width: 400px;
-  margin: auto;
+  width: 600px;
+  margin: 40px auto;
 }
 
 #search {
   width: 100%;
-  padding: 10px;
-  font-size: 16px;
+  padding: 12px;
+  font-size: 28px;
+  border: none;
+  outline: none;
+  background: white;
+  margin-bottom: 4px;
 }
 
-#autocomplete {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  border: 1px solid #ccc;
-  background: #fff;
-}
-
-#autocomplete li {
-  padding: 10px;
+.suggestions div {
+  padding: 12px;
+  font-size: 22px;
+  border: 1px solid black;
+  background: #dcdcdc;
   cursor: pointer;
 }
 
-#autocomplete li:hover {
-  background: #eee;
+.suggestions div:hover {
+  background: #6ad3ff;
 }
 
-.repo {
-  background: #fff;
-  padding: 10px;
-  margin-top: 10px;
-  border: 1px solid #ccc;
-  position: relative;
+.repo-list {
+  margin-top: 20px;
 }
 
-.remove {
-  position: absolute;
-  right: 10px;
-  top: 10px;
+.repo-card {
+  background: #e487fc;
+  border: 1px solid black;
+  margin-bottom: 5px;
+  padding: 12px;
+  font-size: 18px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.repo-info {
+  white-space: pre-line;
+}
+
+.delete-btn {
+  font-size: 36px;
+  color: red;
   cursor: pointer;
-  font-weight: bold;
+  background: transparent;
+  border: none;
 }
+

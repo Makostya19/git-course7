@@ -1,56 +1,68 @@
-const search = document.getElementById("search");
-const list = document.getElementById("autocomplete");
+const input = document.getElementById("search");
+const suggestions = document.getElementById("suggestions");
 const repoList = document.getElementById("repoList");
 
-function debounce(fn, delay = 500) {
-  let t;
+let timer = null;
+
+function debounce(fn, delay = 600) {
   return (...args) => {
-    clearTimeout(t);
-    t = setTimeout(() => fn(...args), delay);
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), delay);
   };
 }
 
-async function fetchRepos(query) {
-  const res = await fetch(
-    `https://api.github.com/search/repositories?q=${query}&per_page=5`
-  );
-  const data = await res.json();
-  return data.items || [];
+async function loadRepos(query) {
+  if (!query.trim()) {
+    suggestions.innerHTML = "";
+    return;
+  }
+
+  try {
+    const res = await fetch(
+      `https://api.github.com/search/repositories?q=${query}&per_page=5`
+    );
+    const data = await res.json();
+
+    suggestions.innerHTML = "";
+
+    if (!data.items) return;
+
+    data.items.forEach(repo => {
+      const option = document.createElement("div");
+      option.textContent = repo.full_name;
+
+      option.addEventListener("click", () => {
+        addRepoToList(repo);
+        suggestions.innerHTML = "";
+        input.value = "";
+      });
+
+      suggestions.appendChild(option);
+    });
+
+  } catch (err) {
+    console.warn("Ошибка API:", err);
+  }
 }
 
-const updateList = debounce(async () => {
-  const q = search.value.trim();
-  list.innerHTML = "";
+function addRepoToList(repo) {
+  const card = document.createElement("div");
+  card.className = "repo-card";
 
-  if (!q) return;
-
-  const repos = await fetchRepos(q);
-
-  repos.forEach(repo => {
-    const li = document.createElement("li");
-    li.textContent = repo.full_name;
-    li.onclick = () => addRepo(repo);
-    list.append(li);
-  });
-}, 400);
-
-search.addEventListener("input", updateList);
-
-function addRepo(repo) {
-  list.innerHTML = "";
-  search.value = "";
-
-  const box = document.createElement("div");
-  box.className = "repo";
-
-  box.innerHTML = `
-    <p><b>Name:</b> ${repo.name}</p>
-    <p><b>Owner:</b> ${repo.owner.login}</p>
-    <p><b>Stars:</b> ${repo.stargazers_count}</p>
-    <span class="remove">X</span>
+  card.innerHTML = `
+    <div class="repo-info">
+      Name: ${repo.name}
+      Owner: ${repo.owner.login}
+      Stars: ${repo.stargazers_count}
+    </div>
+    <button class="delete-btn">✖</button>
   `;
 
-  box.querySelector(".remove").onclick = () => box.remove();
+  card.querySelector(".delete-btn").addEventListener("click", () => {
+    card.remove();
+  });
 
-  repoList.append(box);
+  repoList.appendChild(card);
 }
+
+input.addEventListener("input", debounce(() => loadRepos(input.value)));
